@@ -1,6 +1,6 @@
 <?php 
 	$profile = Profile_CCT::get_object();
-	$taxonomies = $profile->taxonomies; 
+	$taxonomies = $profile::$taxonomies; 
 
 	// Add taxonomy
 	if ( ! empty($_POST) && check_admin_referer( 'add_profile_taxonomy', 'add_profile_taxonomy_field' ) ):
@@ -43,7 +43,7 @@
 ?>
 <h2>Taxonomy Builder</h2>
 <p><strong>Tax&middot;on&middot;o&middot;my</strong> - The classification of something, a way to group things and be able to filter them later.</p>
-<?php echo $note; ?>
+<?php echo isset( $note ) ? $note : ''; ?>
 <h3>Current Taxonomies </h3>
 <?php if ( is_array( $taxonomies ) && ! empty( $taxonomies ) ): ?>
 	<table class="widefat">

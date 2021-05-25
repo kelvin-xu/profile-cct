@@ -29,8 +29,8 @@ class Profile_CCT {
 	 */
 	function __construct () {
 		add_action( 'init', array( $this, 'load' ) );
-		$this->settings   = $this->get_settings( 'settings' );
-		$this->taxonomies = $this->get_settings( 'taxonomy' );
+		self::$settings   = $this->get_settings( 'settings' );
+		self::$taxonomies = $this->get_settings( 'taxonomy' );
 		
 	}
 	
@@ -40,7 +40,7 @@ class Profile_CCT {
 	 * @access public
 	 * @return void
 	 */
-	function get_object() {
+	static function get_object() {
 		if ( self::$classobj === NULL ):
 			self::$classobj = new self;
         endif;
@@ -86,7 +86,7 @@ class Profile_CCT {
 		$this->load_fields();
 		
 		if ( function_exists( 'add_image_size' ) ) { 
-			add_image_size( 'profile-image', $this->settings['picture']['width'], $this->settings['picture']['height'] ); //300 pixels wide (and unlimited height)
+			add_image_size( 'profile-image', self::$settings['picture']['width'], self::$settings['picture']['height'] ); //300 pixels wide (and unlimited height)
 		}
 	}
 	
@@ -161,7 +161,7 @@ class Profile_CCT {
 		$bench_fields = get_option( 'Profile_CCT_form_fields_bench', array() );
 		$side_fields = get_option( 'Profile_CCT_form_fields_side', array() );
 		
-		if ( ! isset( $this->settings['version']['general'] ) || version_compare( '1.3.1', $this->settings['version']['general'], '>' ) ):
+		if ( ! isset( self::$settings['version']['general'] ) || version_compare( '1.3.1', self::$settings['version']['general'], '>' ) ):
 			if ( defined('WP_DEBUG_LOG') && WP_DEBUG_LOG):
 				error_log("Profile CCT: Reregistered custom content type. To fix a bug for 1.3.1");
 			endif;
@@ -170,15 +170,15 @@ class Profile_CCT {
 			flush_rewrite_rules();
 		endif;
 		
-		if ( ! isset( $this->settings['version']['clone_fields'] ) || version_compare( '1.3', $this->settings['version']['clone_fields'], '>' ) ):
+		if ( ! isset( self::$settings['version']['clone_fields'] ) || version_compare( '1.3', self::$settings['version']['clone_fields'], '>' ) ):
 			if ( defined('WP_DEBUG_LOG') && WP_DEBUG_LOG):
 				error_log("Profile CCT: Updated cloned fields to 1.3 standards");
 			endif;
 			
-			if ( isset( $this->settings['clone_fields'] ) ):
-				foreach ( $this->settings['clone_fields'] as $key => $field ):
+			if ( isset( self::$settings['clone_fields'] ) ):
+				foreach ( self::$settings['clone_fields'] as $key => $field ):
 					if ( is_numeric( $key ) ):
-						unset( $this->settings['clone_fields'][$key] );
+						unset( self::$settings['clone_fields'][$key] );
 					endif;
 				endforeach;
 			endif;
@@ -194,7 +194,7 @@ class Profile_CCT {
 						endforeach;
 						
 						unset( $field['blogs'] );
-						$this->settings['clone_fields'][$field['type']] = $field;
+						self::$settings['clone_fields'][$field['type']] = $field;
 						
 						$global_settings['clone_fields'][$key]['blogs'] = $blogs;
 					endif;
@@ -202,7 +202,7 @@ class Profile_CCT {
 			endif;
 		endif;
 		
-		if ( ! isset( $this->settings['version']['taxonomy'] ) || version_compare( '1.3', $this->settings['version']['taxonomy'], '>' ) ):
+		if ( ! isset( self::$settings['version']['taxonomy'] ) || version_compare( '1.3', self::$settings['version']['taxonomy'], '>' ) ):
 			foreach ( $bench_fields as $key => $field ):
 				if ( Profile_CCT::string_starts_with( $field['type'], PROFILE_CCT_TAXONOMY_PREFIX ) ):
 					$side_fields[] = $field;
@@ -211,12 +211,12 @@ class Profile_CCT {
 			endforeach;
 		endif;
 		
-		$this->settings['version']['general'] = PROFILE_CCT_VERSION;
-		$this->settings['version']['clone_fields'] = PROFILE_CCT_VERSION;
-		$this->settings['version']['taxonomy'] = PROFILE_CCT_VERSION;
+		self::$settings['version']['general'] = PROFILE_CCT_VERSION;
+		self::$settings['version']['clone_fields'] = PROFILE_CCT_VERSION;
+		self::$settings['version']['taxonomy'] = PROFILE_CCT_VERSION;
 		update_option( 'Profile_CCT_form_fields_bench', $bench_fields );
 		update_option( 'Profile_CCT_form_fields_side', $side_fields );
-		update_option( PROFILE_CCT_SETTINGS, $this->settings );
+		update_option( PROFILE_CCT_SETTINGS, self::$settings );
 		update_site_option( PROFILE_CCT_SETTING_GLOBAL, $global_settings );
 	}
 	
@@ -229,7 +229,7 @@ class Profile_CCT {
 	 */
 	function sort_posts( $query ) {
 		$is_taxonomy = false;
-		foreach ( $this->taxonomies as $taxonomy ):
+		foreach ( self::$taxonomies as $taxonomy ):
 			if ( is_tax( Profile_CCT_Taxonomy::id( $taxonomy['single'] ) ) ):
 				$is_taxonomy = true;
 				break;
@@ -237,9 +237,9 @@ class Profile_CCT {
 		endforeach;
 		
 		if ( $query->is_main_query() && ( $is_taxonomy || is_post_type_archive( 'profile_cct' ) ) && ! is_admin() ):
-			$order = in_array( $this->settings['sort_order'], array( 'ASC', 'DESC' ) ) ? $this->settings['sort_order'] : null;
+			$order = in_array( self::$settings['sort_order'], array( 'ASC', 'DESC' ) ) ? self::$settings['sort_order'] : null;
 			
-			switch ( $this->settings['sort_order_by'] ):
+			switch ( self::$settings['sort_order_by'] ):
 				case "manual":
 					$query->set( 'orderby', 'menu_order' );
 					if ( is_null( $order ) ) $order = 'ASC';
@@ -277,7 +277,7 @@ class Profile_CCT {
 		if( $md5 =! $_GET['s'] )
 		return ;
 		
-		$settings = array( 'taxonomy'=> $this->taxonomies, 'settings' => $this->settings, 'version' =>  $this->version());
+		$settings = array( 'taxonomy'=> self::$taxonomies, 'settings' => self::$settings, 'version' =>  $this->version());
 	
 		
 		foreach ( array( "form", "page", "list" ) as $where ):
@@ -314,10 +314,10 @@ class Profile_CCT {
 	 * @return void
 	 */
 	function register_profiles() {
-		if ( empty( $this->settings['slug'] ) ):
+		if ( empty( self::$settings['slug'] ) ):
 			$slug = 'person';
 		else:
-			$slug = $this->settings['slug'];
+			$slug = self::$settings['slug'];
 		endif;
 		
 		$labels = array(
@@ -486,7 +486,7 @@ class Profile_CCT {
 	 * @return void
 	 */
 	function delete_option( $type = 'form', $fields_or_tabs = 'fields', $context = 'normal' ) {
-		unset( $this->option[$type][$fields_or_tabs][$context] );
+		unset( $this::$option[$type][$fields_or_tabs][$context] );
 		return delete_option( 'Profile_CCT_'.$type.'_'.$fields_or_tabs.'_'.$context );
 	}
     
@@ -711,8 +711,8 @@ class Profile_CCT {
 	 * @return void
 	 */
 	function get_option( $type = 'form', $subtype = 'fields', $context = 'normal' ) {
-		if ( is_array( $this->option[$type][$subtype][$context] ) ):
-			return $this->option[$type][$subtype][$context]; // return the value from the stored options array.
+		if ( isset( $this::$option[$type][$subtype][$context] ) && is_array( $this::$option[$type][$subtype][$context] ) ):
+			return $this::$option[$type][$subtype][$context]; // return the value from the stored options array.
 		else:
 			// Get the option using Wordpress' built-in function.
 			
@@ -733,9 +733,9 @@ class Profile_CCT {
             if ( $context == 'bench' ):
                 // Check to see if the plugin has been updated since this code last ran. And if so, merge the settings.
                 $perform_merge = false;
-                if ( ! isset( $this->settings['version'][$type][$subtype][$context] ) ): // Is there no version setting?
+                if ( ! isset( self::$settings['version'][$type][$subtype][$context] ) ): // Is there no version setting?
                     $perform_merge = true;
-                elseif ( $this->version() > $this->settings['version'][$type][$subtype][$context] ): // Is the stored version less than the current version?
+                elseif ( $this->version() > self::$settings['version'][$type][$subtype][$context] ): // Is the stored version less than the current version?
                     $perform_merge = true;
                 endif;
                 
@@ -755,7 +755,7 @@ class Profile_CCT {
 			endif;
 		endif;
         
-		$this->option[$type][$subtype][$context] = $options;
+		$this::$option[$type][$subtype][$context] = $options;
 		return $options;
 	}
     
@@ -884,7 +884,7 @@ class Profile_CCT {
 		endif;
 	}
 	
-	function modify_row_actions( $actions, $post ) {
+	static function modify_row_actions( $actions, $post ) {
 		global $current_user;
 		
 		if ( $post->post_type == "profile_cct" ) {
@@ -894,9 +894,9 @@ class Profile_CCT {
 			}
 			
 			if ( defined('WP_DEBUG_LOG') && WP_DEBUG_LOG ) {
-				error_log( print_r($post, TRUE));
-				error_log( print_r($current_user, TRUE));
-				error_log( print_r($actions, TRUE));
+				//error_log( print_r($post, TRUE));
+				//error_log( print_r($current_user, TRUE));
+				//error_log( print_r($actions, TRUE));
 			}
 		}
 		return $actions; 
@@ -934,7 +934,7 @@ class Profile_CCT {
 	 * @param mixed $needle
 	 * @return void
 	 */
-	function string_starts_with( $haystack, $needle ) {
+	static function string_starts_with( $haystack, $needle ) {
     	return ! strncmp( $haystack, $needle, strlen($needle) );
 	}
 	
@@ -975,8 +975,8 @@ class Profile_CCT {
 		
 		unset($field['blogs']);
 		if( 'skip' != $skip_local ):
-			$this->settings['clone_fields'][$field['type']] = $field;			
-			update_option( PROFILE_CCT_SETTINGS, $this->settings );
+			self::$settings['clone_fields'][$field['type']] = $field;			
+			update_option( PROFILE_CCT_SETTINGS, self::$settings );
 			
 		endif;
 		
@@ -1018,7 +1018,7 @@ class Profile_CCT {
 		
 		if( $blogs[$blog_id] ): // we accually have the blog set up as true
 			unset($blogs[$blog_id]);
-			unset( $this->settings['clone_fields'][$field['type']]);
+			unset( self::$settings['clone_fields'][$field['type']]);
 			
 			if ( empty($blogs) ):
 				unset($global_settings['clone_fields'][$field_index]);
@@ -1028,7 +1028,7 @@ class Profile_CCT {
 			endif;
 			
 			if( 'skip' == $skip_local)
-				update_option( PROFILE_CCT_SETTINGS, $this->settings );
+				update_option( PROFILE_CCT_SETTINGS, self::$settings );
 			
 			update_site_option( PROFILE_CCT_SETTING_GLOBAL, $global_settings );
 		endif;
@@ -1050,8 +1050,8 @@ class Profile_CCT {
 			$this->remove_global_field( $field, $field_index, 'skip' );
 		endforeach; 
 		
-		$this->settings['clone_fields'] = array();
-		update_option( PROFILE_CCT_SETTINGS, $this->settings );
+		self::$settings['clone_fields'] = array();
+		update_option( PROFILE_CCT_SETTINGS, self::$settings );
 		
 
 	}

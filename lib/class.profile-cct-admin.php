@@ -159,11 +159,11 @@ class Profile_CCT_Admin {
 	 * @access public
 	 * @return void
 	 */
-	function update_clone_fields(){
+	static function update_clone_fields(){
 		global $blog_id;
 		$profile = Profile_CCT::get_object();
 		
-		if ( isset( $profile->settings['updated_clone_fields'] ) ):
+		if ( isset( $profile::$settings['updated_clone_fields'] ) ):
 			return;
 		endif;
 		
@@ -183,19 +183,19 @@ class Profile_CCT_Admin {
 			
 			if ( is_array( $current_fields ) ):
 				foreach ( $current_fields as $current_field_key => $current_field_data ):
-					if ( isset( $profile->settings['clone_fields'][$current_field_key] ) && is_array( $profile->settings['clone_fields'][$current_field_key] )):
-						$merge_current_fields[$current_field_key] = shortcode_atts($profile->settings['clone_fields'][$current_field_key], $current_field_data );
+					if ( isset( $profile::$settings['clone_fields'][$current_field_key] ) && is_array( $profile::$settings['clone_fields'][$current_field_key] )):
+						$merge_current_fields[$current_field_key] = shortcode_atts($profile::$settings['clone_fields'][$current_field_key], $current_field_data );
 					else:
 						$merge_current_fields[$current_field_key] = $current_field_data;
 					endif;
 				endforeach;
 			endif;
 			
-			$profile->settings['clone_fields'] = $merge_current_fields;
-			$profile->settings['updated_clone_fields'] = PROFILE_CCT_VERSION;
+			$profile::$settings['clone_fields'] = $merge_current_fields;
+			$profile::$settings['updated_clone_fields'] = PROFILE_CCT_VERSION;
 			
 			self::ask_user_to_update_profiles();
-			update_option( PROFILE_CCT_SETTINGS, $profile->settings );
+			update_option( PROFILE_CCT_SETTINGS, $profile::$settings );
 		endif;
 	}
 	
@@ -575,7 +575,7 @@ class Profile_CCT_Admin {
 	static function get_option( $type = 'form', $fields_or_tabs = 'fields', $context = 'normal' ){
 		$profile = Profile_CCT::get_object();
 		// return the options from the array stored
-		if ( is_array( self::$option[$type][$fields_or_tabs][$context] ) ):
+		if ( isset( self::$option[$type][$fields_or_tabs][$context] ) && is_array( self::$option[$type][$fields_or_tabs][$context] ) ):
 			return self::$option[$type][$fields_or_tabs][$context];
 		else:
 			// get the option
@@ -596,9 +596,9 @@ class Profile_CCT_Admin {
 			/* CHECK to see if we need to do the merge */
 			$perform_merge = false;
             
-			if ( ! isset( $profile->settings['version'][$type][$fields_or_tabs][$context] ) ): // can we find the version settings
+			if ( ! isset( $profile::$settings['version'][$type][$fields_or_tabs][$context] ) ): // can we find the version settings
 				$perform_merge = true;
-			elseif ( PROFILE_CCT_VERSION > $profile->settings['version'][$type][$fields_or_tabs][$context] ): // are they less then the current version
+			elseif ( PROFILE_CCT_VERSION > $profile::$settings['version'][$type][$fields_or_tabs][$context] ): // are they less then the current version
 				$perform_merge = true;
 			endif;
             
@@ -607,7 +607,7 @@ class Profile_CCT_Admin {
 				$new_fields = self::default_options( 'new_fields' );
                 
 				// lets add the new fields in this version to the banch
-				if ( is_array( $new_fields[PROFILE_CCT_VERSION] ) ):
+				if ( isset( $new_fields[PROFILE_CCT_VERSION] ) && is_array( $new_fields[PROFILE_CCT_VERSION] ) ):
 					foreach ( $new_fields[PROFILE_CCT_VERSION] as $field ) :
 						if ( in_array( $type , $field['where'] ) ):
 							$options[] = $field['field'];
@@ -635,13 +635,13 @@ class Profile_CCT_Admin {
 	 */
 	static function update_option( $type = 'form', $fields_or_tabs = 'fields', $context = 'normal', $update ) {
 		$profile = Profile_CCT::get_object();
-		$profile->settings['version'][$type][$fields_or_tabs][$context] = PROFILE_CCT_VERSION;
-		$profile->settings[$type.'_updated'] = time();
+		$profile::$settings['version'][$type][$fields_or_tabs][$context] = PROFILE_CCT_VERSION;
+		$profile::$settings[$type.'_updated'] = time();
 		// Saving of the version number
 		self::$option[$type][$fields_or_tabs][$context] = $update;
 		
 		// Update the settings
-		update_option( PROFILE_CCT_SETTINGS, $profile->settings );
+		update_option( PROFILE_CCT_SETTINGS, $profile::$settings );
         
 		return update_option( 'Profile_CCT_'.$type.'_'.$fields_or_tabs.'_'.$context, $update );
 	}
@@ -680,7 +680,7 @@ class Profile_CCT_Admin {
 	 * @access public
 	 * @return void
 	 */
-	function icon() {
+	static function icon() {
 		printf( '<img src="%s/icon-64.png" class="icon32" width="32" height="32" />', PROFILE_CCT_DIR_URL );
 	}
 	
@@ -948,7 +948,7 @@ class Profile_CCT_Admin {
 	 * @param mixed $post_data
 	 * @return void
 	 */
-	function insert_post( $post_id, $post_data ) {
+	static function insert_post( $post_id, $post_data ) {
 	
 		global $wpdb;
 
@@ -1158,12 +1158,12 @@ class Profile_CCT_Admin {
 					$options[$_POST['field_index']]['url_prefix']  = $url_prefix;
 					
 					// Save the url prefix also in the settings array.
-					if ( ! is_array( $profile->settings['data_url'] ) ):
-						$profile->settings['data_url'] = array();
+					if ( ! is_array( $profile::$settings['data_url'] ) ):
+						$profile::$settings['data_url'] = array();
 					endif;
 					
-					$profile->settings['data_url'][$_POST['type']] = $url_prefix;
-					update_option( PROFILE_CCT_SETTINGS, $profile->settings );
+					$profile::$settings['data_url'][$_POST['type']] = $url_prefix;
+					update_option( PROFILE_CCT_SETTINGS, $profile::$settings );
 					break;
 				case "page":
 				case "list":

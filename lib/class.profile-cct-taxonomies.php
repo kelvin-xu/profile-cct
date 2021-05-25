@@ -14,10 +14,10 @@ class Profile_CCT_Taxonomy {
 		$profile = Profile_CCT::get_object();
 		
 		// remove some taxonomies
-		$profile->taxonomies = self::remove( $profile->taxonomies );
+		$profile::$taxonomies = self::remove( $profile::$taxonomies );
 		
-		if ( is_array( $profile->taxonomies ) ):
-			foreach ( $profile->taxonomies as $taxonomy ):
+		if ( is_array( $profile::$taxonomies ) ):
+			foreach ( $profile::$taxonomies as $taxonomy ):
 				self::register( $taxonomy );
 			endforeach;
 		endif;
@@ -28,8 +28,8 @@ class Profile_CCT_Taxonomy {
 	public static function remove_meta_boxes() {
 		$profile = Profile_CCT::get_object();
 		
-		if ( is_array( $profile->taxonomies ) ):
-			foreach ( $profile->taxonomies as $taxonomy ):
+		if ( is_array( $profile::$taxonomies ) ):
+			foreach ( $profile::$taxonomies as $taxonomy ):
 				$id = self::id($taxonomy['single']);
 				
 				if ( $taxonomy['hierarchical'] == true ):

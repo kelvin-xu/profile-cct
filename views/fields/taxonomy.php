@@ -23,7 +23,7 @@ class Profile_CCT_Taxonomy_Field extends Profile_CCT_Field {
 		
 		$profile = Profile_CCT::get_object();
 		
-		foreach ( $profile->taxonomies as $taxonomy ):
+		foreach ( $profile::$taxonomies as $taxonomy ):
 			$id = Profile_CCT_Taxonomy::id( $taxonomy['single'] );
 			
 			add_action( 'profile_cct_'.$id.'_add_meta_box', array( __CLASS__, 'add_meta_box' ), 10, 3 );
@@ -52,7 +52,7 @@ class Profile_CCT_Taxonomy_Field extends Profile_CCT_Field {
 		);
 		
 		$profile = Profile_CCT::get_object();
-		foreach ( $profile->taxonomies as $taxonomy ):
+		foreach ( $profile::$taxonomies as $taxonomy ):
 			if ( $this->options['type'] == Profile_CCT_Taxonomy::id( $taxonomy['single'] ) ):
 				$display = ( isset( $taxonomy['display'] ) ? $taxonomy['display'] : 'default' );
 			endif;
@@ -107,10 +107,10 @@ class Profile_CCT_Taxonomy_Field extends Profile_CCT_Field {
 		endif;
 	}
 	
-	function add_taxonomy_fields( $fields ) {
+	static function add_taxonomy_fields( $fields ) {
 		$profile = Profile_CCT::get_object();
 		
-		foreach ( $profile->taxonomies as $taxonomy ):
+		foreach ( $profile::$taxonomies as $taxonomy ):
 			// Add it to the fields
 			$sanitized_single = str_replace( '-', '_', sanitize_title( $taxonomy['single'] ) );
 			$fields[] = array(
@@ -132,7 +132,7 @@ class Profile_CCT_Taxonomy_Field extends Profile_CCT_Field {
 		);
 		
 		$profile = Profile_CCT::get_object();
-		$taxonomies = $profile->taxonomies;
+		$taxonomies = $profile::$taxonomies;
 		
 		foreach ( $taxonomies as $taxonomy ):
 			if ( Profile_CCT_Taxonomy::id( $taxonomy['single'] ) == $field['type'] ):
@@ -288,7 +288,7 @@ class Profile_CCT_Checkbox_Walker extends Walker {
 		$output .= ob_get_clean();
 	}
 	
-	function start_el( &$output, $category, $depth, $args, $id = 0 ) {
+	function start_el( &$output, $category, $depth = 0, $args = array(), $id = 0 ) {
 		extract($args);
 		if ( empty($taxonomy) )
 		$taxonomy = 'category';
@@ -321,7 +321,7 @@ class Profile_CCT_Checkbox_Walker extends Walker {
 class Profile_CCT_Dropdown_Walker extends Walker {
 	var $db_fields = array ( 'parent' => 'parent', 'id' => 'term_id' );
 	
-	function start_el( &$output, $category, $depth, $args, $id = 0 ) {
+	function start_el( &$output, $category, $depth = 0, $args = array(), $id = 0 ) {
 		extract($args);
 		
 		print_r($args);
@@ -345,6 +345,6 @@ class Profile_CCT_Dropdown_Walker extends Walker {
 	}
 }
 
-if ( is_array( Profile_CCT::get_object()->taxonomies ) ):
+if ( is_array( Profile_CCT::get_object()::$taxonomies ) ):
 	Profile_CCT_Taxonomy_Field::init();
 endif;

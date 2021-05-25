@@ -30,7 +30,7 @@
 	    		foreach( $settings as $setting_name => $setting_value ) {
 	    			
 	    			if(  'settings' == $setting_name) :
-	    				$profile->settings = $setting_value;
+	    				$profile::$settings = $setting_value;
 	    				foreach ($setting_value['clone_fields'] as $field_type => $field):
 	    					$profile->add_global_field( $field, null, 'skip' );
 	    				endforeach;
@@ -67,41 +67,41 @@
 		$height = intval( $_POST['picture_height'] );
 		if ( $width >= 100 && $width <= 560 && $height >= 100 && $height <= 560 ):
 			$picture_options = array( 'width' => $width, 'height' => $height );
-			$profile->settings['picture'] = $picture_options;
+			$profile::$settings['picture'] = $picture_options;
 		else:
 			$note = '<div class="error settings-error"><p>Picture dimensions should be between 100x100 and 560x560</p></div>';
 		endif;
 		
 		$slug = trim( $_POST['slug'] );
 		if ( ! empty( $slug ) ):
-			$profile->settings['slug'] = trim( sanitize_title( $_POST['slug'] ) );
+			$profile::$settings['slug'] = trim( sanitize_title( $_POST['slug'] ) );
 		else:
-			$profile->settings['slug'] = 'person';
+			$profile::$settings['slug'] = 'person';
 		endif;
 		
 		$order_by = $_POST['sort_order_by'];
 		$order = in_array( $_POST['sort_order'], array( 'ASC', 'DESC' ) ) ? $_POST['sort_order'] : null ;
 		if ( in_array( $order_by, array( "manual", "first_name", "last_name", "date" ) ) ):
-			$profile->settings['sort_order_by'] = $order_by;
-			$profile->settings['sort_order'] = $order;
+			$profile::$settings['sort_order_by'] = $order_by;
+			$profile::$settings['sort_order'] = $order;
 		endif;
 		
 		$widget_title = $_POST['widget_title'];
-		$profile->settings['widget_title'] = $widget_title;
+		$profile::$settings['widget_title'] = $widget_title;
 		
 		$archive = $_POST['archive'];
-		$profile->settings['archive'] = $archive;
+		$profile::$settings['archive'] = $archive;
 		
 		// Lets deal with permissions	
 		$post_permissions = $_POST['options']['permissions'];
 		
-		foreach ( $profile->settings['permissions'] as $user => $permission_array ):
+		foreach ( $profile::$settings['permissions'] as $user => $permission_array ):
 			if ( $user != 'administrator' ): // Don't want people changing the permissions of the admin
 				$role = get_role($user);
 				
 				foreach ( $permission_array as $permission => $can ):
-					if ( isset( $profile->settings['permissions'][$user][$permission] ) ): // Does the permission exist in the settings
-						$profile->settings['permissions'][$user][$permission] = (bool) $post_permissions[$user][$permission];
+					if ( isset( $profile::$settings['permissions'][$user][$permission] ) ): // Does the permission exist in the settings
+						$profile::$settings['permissions'][$user][$permission] = (bool) $post_permissions[$user][$permission];
 						// Add the new capability
 						if ( (bool) $post_permissions[$user][$permission] ): 
 							$role->add_cap( $permission );
@@ -114,7 +114,7 @@
 				// Admin role. You can't change the default permissions for the administater
 				$role = get_role( 'administrator' );
 				// The admin gets the best permissions (all of them)
-				foreach ( $profile->settings['permissions']['administrator'] as $permission => $can ):
+				foreach ( $profile::$settings['permissions']['administrator'] as $permission => $can ):
 					$role->add_cap( $permission );
 				endforeach;
 			endif;
@@ -127,10 +127,10 @@
 				'advanced' => ( isset( $_POST['wp_editor']['advanced'] ) ? true : false),
 				 );
 		
-		$profile->settings['wp_editor'] = $wp_editor;
+		$profile::$settings['wp_editor'] = $wp_editor;
 		
 		// Store updated options
-        update_option( 'Profile_CCT_settings', $profile->settings );
+        update_option( 'Profile_CCT_settings', $profile::$settings );
 		$note = '<div class="updated below-h2"><p> Settings saved.</p></div>';
 		
 		// Lets flush the rules again
@@ -138,12 +138,12 @@
 		flush_rewrite_rules();
 	endif;
 	
-	if ( ! isset( $profile->settings['picture'] ) )           $profile->settings['picture'] = array( 'width' => 150, 'height' => 150 );
-	if ( ! isset( $profile->settings['picture']['width'] ) )  $profile->settings['picture']['width'] = 150;
-	if ( ! isset( $profile->settings['picture']['height'] ) ) $profile->settings['picture']['height'] = 150;
-	if ( ! isset( $profile->settings['slug'] ) )              $profile->settings['slug'] = 'person';
-	if ( ! isset( $profile->settings['sort_order_by'] ) )     $profile->settings['sort_order_by'] = 'first_name';
-	if ( ! isset( $profile->settings['sort_order'] ) )        $profile->settings['sort_order'] = 'ASC';
+	if ( ! isset( $profile::$settings['picture'] ) )           $profile::$settings['picture'] = array( 'width' => 150, 'height' => 150 );
+	if ( ! isset( $profile::$settings['picture']['width'] ) )  $profile::$settings['picture']['width'] = 150;
+	if ( ! isset( $profile::$settings['picture']['height'] ) ) $profile::$settings['picture']['height'] = 150;
+	if ( ! isset( $profile::$settings['slug'] ) )              $profile::$settings['slug'] = 'person';
+	if ( ! isset( $profile::$settings['sort_order_by'] ) )     $profile::$settings['sort_order_by'] = 'first_name';
+	if ( ! isset( $profile::$settings['sort_order'] ) )        $profile::$settings['sort_order'] = 'ASC';
 	
 	$global_settings = get_site_option( PROFILE_CCT_SETTING_GLOBAL, array() );
 	
@@ -160,7 +160,7 @@
 					<label for="picture_width">Width</label>
 				</th>
 				<td>
-					<input type="text" size="3" name="picture_width" id="picture_width" value="<?php echo esc_attr( $profile->settings['picture']['width'] ); ?>" /> pixels
+					<input type="text" size="3" name="picture_width" id="picture_width" value="<?php echo esc_attr( $profile::$settings['picture']['width'] ); ?>" /> pixels
 				</td>
 			</tr>
 			<tr valign="top">
@@ -168,7 +168,7 @@
 					<label for="picture_height">Height</label>
 				</th>
 				<td>
-					<input type="text" size="3" name="picture_height" id="picture_height" value="<?php echo esc_attr( $profile->settings['picture']['height'] ); ?>" /> pixels
+					<input type="text" size="3" name="picture_height" id="picture_height" value="<?php echo esc_attr( $profile::$settings['picture']['height'] ); ?>" /> pixels
 				</td>
 			</tr>
         </tbody>
@@ -181,8 +181,8 @@
 				<th scope="row"><label for="slug">Order by</label></th>
 				<td>
 					<?php
-						$sort_order_by = $profile->settings['sort_order_by'];
-						$sort_order = $profile->settings['sort_order'];
+						$sort_order_by = $profile::$settings['sort_order_by'];
+						$sort_order = $profile::$settings['sort_order'];
 					?>
 					<select name="sort_order_by" id="sort_order_by" onchange="update_sort_order_dropdown(jQuery(this).val());">
 						<option value="manual" <?php selected( "manual", $sort_order_by ); ?>>Manually</option>
@@ -230,35 +230,35 @@
                 <th scope="row"><label for="widget-title">Widget Title</label></th>
                 <td>
 					<?php
-					if ( empty( $profile->settings['widget_title'] ) ) $profile->settings['widget_title'] = "Profile Navigation";
+					if ( empty( $profile::$settings['widget_title'] ) ) $profile::$settings['widget_title'] = "Profile Navigation";
 					?>
-                    <input type="text" name="widget_title" id="widget-title" value="<?php echo esc_attr($profile->settings['widget_title']); ?>" />
+                    <input type="text" name="widget_title" id="widget-title" value="<?php echo esc_attr($profile::$settings['widget_title']); ?>" />
                 </td>
             </tr>
             <tr valign="top">
                 <th scope="row"><label for="archive_display_searchbox">Show Search Box</label></th>
                 <td>
-                    <input type="checkbox" name="archive[display_searchbox]" id="archive_display_searchbox" value="true" <?php checked( !empty( $profile->settings['archive']['display_searchbox']) ); ?> />
+                    <input type="checkbox" name="archive[display_searchbox]" id="archive_display_searchbox" value="true" <?php checked( !empty( $profile::$settings['archive']['display_searchbox']) ); ?> />
                 </td>
             </tr>
             <tr valign="top">
                 <th scope="row"><label for="archive_display_alphabet">Show Alphabet Listing</label></th>
                 <td>
-                    <input type="checkbox" name="archive[display_alphabet]" id="archive_display_alphabet" value="true" <?php checked( !empty($profile->settings['archive']['display_alphabet'])); ?> />
+                    <input type="checkbox" name="archive[display_alphabet]" id="archive_display_alphabet" value="true" <?php checked( !empty($profile::$settings['archive']['display_alphabet'])); ?> />
                 </td>
             </tr>
             <tr valign="top">
                 <th scope="row"><label for="archive_display_orderby">Show Order By</label></th>
                 <td>
-                    <input type="checkbox" name="archive[display_orderby]" id="archive_display_orderby" value="true" <?php checked(!empty($profile->settings['archive']['display_orderby'])); ?> />
+                    <input type="checkbox" name="archive[display_orderby]" id="archive_display_orderby" value="true" <?php checked(!empty($profile::$settings['archive']['display_orderby'])); ?> />
                 </td>
             </tr>
             <tr valign="top">
                 <th scope="row">Show Taxonomies</th>
                 <td>
-                    <?php foreach ( $profile->taxonomies as $taxonomy ): ?>
+                    <?php foreach ( $profile::$taxonomies as $taxonomy ): ?>
 						<?php $taxonomy_id = Profile_CCT_Taxonomy::id( $taxonomy['single'] ); ?>
-						<input type="checkbox" name="archive[display_tax][<?php echo $taxonomy_id; ?>]" id="archive_display_tax_<?php echo $taxonomy_id; ?>" value="true" <?php checked($profile->settings['archive']['display_tax'][$taxonomy_id], 'true'); ?> />
+						<input type="checkbox" name="archive[display_tax][<?php echo $taxonomy_id; ?>]" id="archive_display_tax_<?php echo $taxonomy_id; ?>" value="true" <?php checked($profile::$settings['archive']['display_tax'][$taxonomy_id], 'true'); ?> />
 						<label style="padding-left:6px;" for="archive_display_tax_<?php echo $taxonomy_id; ?>"><?php echo $taxonomy['plural']; ?></label>
 						<br />
 					<?php endforeach; ?>
@@ -273,7 +273,7 @@
             <tr valign="top">
                 <th scope="row"><label for="slug">Slug</label></th>
                 <td>
-					<input type="text" name="slug" id="slug" value="<?php echo esc_attr($profile->settings['slug']); ?>" />
+					<input type="text" name="slug" id="slug" value="<?php echo esc_attr($profile::$settings['slug']); ?>" />
 					<br />
                     By default this is set to 'person'
                 </td>
@@ -298,8 +298,8 @@
 		<tbody id="the-list">
 			<?php 
 				$count = 0;
-				foreach( $profile->settings['permissions'] as $user => $permission ):
-					Profile_CCT_Admin::permissions_table( $user, ($count % 2), $profile->settings ); $count++;
+				foreach( $profile::$settings['permissions'] as $user => $permission ):
+					Profile_CCT_Admin::permissions_table( $user, ($count % 2), $profile::$settings ); $count++;
 				endforeach;
 			?>
 		</tbody>
@@ -311,14 +311,14 @@
             <tr valign="top">
                 <th scope="row"><label for="wp_editor_mediabutton">Enable Media Upload</label></th>
                 <td>
-                    <input type="checkbox" name="wp_editor[media_buttons]" id="wp_editor_mediabutton" value="true" <?php checked( $profile->settings['wp_editor']['media_buttons'], true); ?> /> 
+                    <input type="checkbox" name="wp_editor[media_buttons]" id="wp_editor_mediabutton" value="true" <?php checked( $profile::$settings['wp_editor']['media_buttons'], true); ?> /> 
                     <small>Allow users that can <strong>publish</strong> thier profile to upload media files</small>.
                 </td>
             </tr>
             <tr valign="top">
                 <th scope="row"><label for="wp_editor_advanced">Advanced Editor Options</label></th>
                 <td>
-                    <input type="checkbox" name="wp_editor[advanced]" id="wp_editor_simple" value="true" <?php checked($profile->settings['wp_editor']['advanced'], true); ?> />
+                    <input type="checkbox" name="wp_editor[advanced]" id="wp_editor_simple" value="true" <?php checked($profile::$settings['wp_editor']['advanced'], true); ?> />
                     <small>The <abbr title="What You See Is What You Get">WYSIWYG</abbr> editor will have more formating options available for the profile builder.</small>
                 </td>
             </tr>

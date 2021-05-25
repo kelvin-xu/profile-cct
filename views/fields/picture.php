@@ -17,7 +17,7 @@ Class Profile_CCT_Picture extends Profile_CCT_Field {
 		'after'        => '',
 	);
 	
-	function init() {
+	static function init() {
 		add_action( 'wp_ajax_profile_cct_picture_add_photo',   array( 'Profile_CCT_Picture', 'add_picture' ) );
 		add_action( 'wp_ajax_profile_cct_picture_delete_ajax', array( 'Profile_CCT_Picture', 'remove_picture' ) );
 		add_action( 'profile_cct_picture_iframe_head',         array( 'Profile_CCT_Picture', 'init_iframe' ) );
@@ -233,7 +233,7 @@ Class Profile_CCT_Picture extends Profile_CCT_Field {
 	 */
 	static function picture_options() {
 		$profile = Profile_CCT::get_object();
-		$options = $profile->settings;
+		$options = $profile::$settings;
 		
 		if ( ! isset( $options['picture'] ) ):
 			$options['picture'] = array(

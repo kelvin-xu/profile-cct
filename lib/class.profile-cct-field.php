@@ -50,8 +50,8 @@ class Profile_CCT_Field {
 		$this->description   = ( isset( $this->options['description'] ) ? $this->options['description'] : null );
 		$this->show_link_to  = ( isset( $this->options['show_link_to'] ) ? $this->options['show_link_to'] : false );
 		$this->link_to       = ( isset( $this->options['link_to'] ) && $this->options['link_to']  ? true : false );
-		$this->show          = ( is_array( $this->options['show'] ) ? $this->options['show'] : array() ) ;
-		$this->show_fields   = ( is_array( $this->options['show_fields'] ) ? $this->options['show_fields'] : array() ) ;
+		$this->show          = ( isset( $this->options['show'] ) && is_array( $this->options['show'] ) ? $this->options['show'] : array() ) ;
+		$this->show_fields   = ( isset( $this->options['show_fields'] ) && is_array( $this->options['show_fields'] ) ? $this->options['show_fields'] : array() ) ;
 		$this->class         = ( isset( $this->options['class'] ) ? $this->options['class'] : "" );
 		$this->hide_label    = ( isset( $this->options['hide_label'] ) && $this->options['hide_label'] ? true: false );
 		$this->width         = ( isset( $this->options['width'] ) ? $this->options['width'] : false );
@@ -492,7 +492,7 @@ class Profile_CCT_Field {
 	 */
 	function input_textarea( $attr ) {
 		$profile = Profile_CCT::get_object();
-		$options = $profile->settings['wp_editor'];
+		$options = $profile::$settings['wp_editor'];
 		$attr = $this->field_attr( $attr, 'textarea' );
 		
 		?>
@@ -744,7 +744,7 @@ class Profile_CCT_Field {
 		$cols  = ( isset( $attr['cols']        ) ? ' cols="' . $attr['cols']       .'" ' : ''                    );
 		$class = ( isset( $attr['class']       ) ? ' class="'. $attr['class']      .'" ' : ' class="field text"' );
 		
-		if ( is_array( $attr['data'] ) ):
+		if ( isset( $attr['data'] ) && is_array( $attr['data'] ) ):
 			$data = "";
 			foreach ( $attr['data'] as $key => $value ):
 				$data .= 'data-'.$key.'="'.$value.'" ';
