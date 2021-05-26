@@ -586,7 +586,7 @@ class Profile_CCT_Admin {
 				$default = self::default_options( $type );
                 
 				if ( $fields_or_tabs == 'fields' ):
-					$options = $default[$fields_or_tabs][$context];
+					$options = isset( $default[$fields_or_tabs][$context] ) ? $default[$fields_or_tabs][$context] : array();
 				else:
 					$options = $default[$fields_or_tabs];
                 endif;
