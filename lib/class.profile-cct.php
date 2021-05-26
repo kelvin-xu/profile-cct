@@ -814,7 +814,8 @@ class Profile_CCT {
                         $callback = 'profile_cct_'.$field['type'].'_shell';
                         
 						if ( function_exists( $callback ) ):
-                            $id = $field['type']."-".$i.'-'.rand(0, 999);
+                            $id = $field['type']."--".rand(0, 999);
+							var_dump($id);
                             $title = $field['label'];
                             $post_type = 'profile_cct';
                             $priority = 'core';
