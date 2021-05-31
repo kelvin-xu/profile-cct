@@ -743,9 +743,9 @@ class Profile_CCT_Field {
 		$row   = ( isset( $attr['row']         ) ? ' row="'  . $attr['row']        .'" ' : ''                    );
 		$cols  = ( isset( $attr['cols']        ) ? ' cols="' . $attr['cols']       .'" ' : ''                    );
 		$class = ( isset( $attr['class']       ) ? ' class="'. $attr['class']      .'" ' : ' class="field text"' );
+		$data  = "";
 		
 		if ( isset( $attr['data'] ) && is_array( $attr['data'] ) ):
-			$data = "";
 			foreach ( $attr['data'] as $key => $value ):
 				$data .= 'data-'.$key.'="'.$value.'" ';
 			endforeach;
