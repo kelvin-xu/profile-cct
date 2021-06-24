@@ -31,16 +31,16 @@ Class Profile_CCT_Social extends Profile_CCT_Field {
 		$this->input_select( array(
 			'field_id'   => 'option',
 			'label'      => 'Site',
-			'value'      => $this->data['option'],
+			'value'      => $this->data ? $this->data['option'] : '',
 			'all_fields' => $this->social_options('label'),
 			'type'       => 'select',
-			'count'      => $count,
+			'count'      => isset($count) ? $count : 0,
 		) );
 		$this->input_text( array(
 			'field_id'   => 'username',
 			'label'      => ( isset( $this->data['option'] ) ? $this->social_options( 'user_url', $this->data['option'] ) : "" ),
-			'value'      => $this->data['username'],
-			'all_fields' => $social_array,
+			'value'      => isset($this->data['username']) ? $this->data['username'] : '',
+			'all_fields' => isset($social_array) ? $social_array : array(),
 		) );
 	}
 	

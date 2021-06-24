@@ -236,7 +236,7 @@ class Profile_CCT_Admin {
 		endforeach;
 		
 		// correct the bench fields 
-		self::$option[$where]['fields']['bench'] = $bench_fields;
+		self::$option[$where]['fields']['bench'] = isset($bench_fields) ? $bench_fields : array();
         
 		// DYNAMIC FIELDS
 		// all the fields that get included
@@ -449,7 +449,7 @@ class Profile_CCT_Admin {
 	 */
 	public static function admin_pages() {
 		self::$action = 'edit';
-		self::$page = ( in_array( $_GET['view'], array( 'form', 'page', 'list', 'taxonomy', 'fields', 'settings' ) ) ? $_GET['view'] : 'about' );
+		self::$page = ( isset($_GET['view']) && in_array( $_GET['view'], array( 'form', 'page', 'list', 'taxonomy', 'fields', 'settings' ) ) ? $_GET['view'] : 'about' );
         
 		// the header file determins what other files should be loaded here
 		require( PROFILE_CCT_DIR_PATH.'views/header.php' );
@@ -464,6 +464,11 @@ class Profile_CCT_Admin {
 	public static function admin_styles() {
 		// todo: this could be done with one css file
 		wp_enqueue_style( 'profile-cct-admin', PROFILE_CCT_DIR_URL.'/css/admin.css' );
+
+		if( ! isset( $_GET['view'] ) ) {
+			return;
+		}
+
 		switch( $_GET['view'] ):
 		case "form":
 		case "page":
@@ -483,6 +488,13 @@ class Profile_CCT_Admin {
 	 * @return void
 	 */
 	public static function admin_scripts() {
+
+		wp_enqueue_script( 'profile-cct-settings', PROFILE_CCT_DIR_URL.'/js/admin.js' );
+
+		if( ! isset( $_GET['view'] ) ) {
+			return;
+		}
+
 		switch( $_GET['view'] ):
 		case "form":
 			wp_enqueue_script( 'profile-cct-form', PROFILE_CCT_DIR_URL.'/js/form.js',array('jquery', 'jquery-ui-sortable') );
@@ -501,8 +513,7 @@ class Profile_CCT_Admin {
 			wp_localize_script( 'profile-cct-form', 'ProfileCCT', array( 'page' => 'list' ) );
 			break;
 		endswitch;
-        
-		wp_enqueue_script( 'profile-cct-settings', PROFILE_CCT_DIR_URL.'/js/admin.js' );
+    
 	}
 
 	/**
@@ -863,10 +874,11 @@ class Profile_CCT_Admin {
 				echo $shell;
 				if ( is_array( $fields ) ):
 					foreach ( $fields as $field ):
+						$field_type = isset($field) && isset($data[ $field['type'] ]) ? $data[ $field['type'] ] : null;
 						if ( function_exists( 'profile_cct_'.$field['type'].'_shell' ) ):
-							call_user_func( 'profile_cct_'.$field['type'].'_shell', $field, $data[ $field['type'] ] );
+							call_user_func( 'profile_cct_'.$field['type'].'_shell', $field, $field_type );
 						else:
-							do_action( 'profile_cct_shell_'.$field['type'], $field, $data[ $field['type'] ] );
+							do_action( 'profile_cct_shell_'.$field['type'], $field, $field_type );
 						endif;
 					endforeach;
 				endif;
@@ -1136,7 +1148,7 @@ class Profile_CCT_Admin {
 			$where = 'form';
 		endif;
 		
-		if ( in_array( $_POST['width'], array( 'full', 'half', 'one-third', 'two-third' ) ) ):
+		if ( isset($_POST['width']) && in_array( $_POST['width'], array( 'full', 'half', 'one-third', 'two-third' ) ) ):
 			$width = $_POST['width'];
 		else:
 			$width = 'full';
@@ -1206,7 +1218,7 @@ class Profile_CCT_Admin {
 	 * @access public
 	 * @return void
 	 */
-	function update_tabs() {
+	static function update_tabs() {
 		$where = in_array( $_POST['where'], array( 'page', 'form' ) ) ? $_POST['where'] : 'form';
 		$tabs = self::get_option( $where, 'tabs' );
 		

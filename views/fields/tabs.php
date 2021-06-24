@@ -12,6 +12,7 @@ Class Profile_CCT_Tabs {
 		$post_id = ( isset( $post->ID) ? $post->ID : 0 ); 
 		$editing = ( 'edit' == Profile_CCT_Admin::$action ?  true : false );
 		$tabs = Profile_CCT_Admin::get_option( Profile_CCT_Admin::$page, 'tabs' ); // get back all the tabs for that page
+		$profile_cct_tabs = 0;
 		
 		// check if we even want to display the tabs. 
 		$display_tabs = true;
@@ -86,7 +87,7 @@ Class Profile_CCT_Tabs {
 			<?php $theme_support = get_theme_support('tabs'); ?>
 			<?php if ( $editing ): ?>
 				<div id="add-tabshell"></div>
-			<?php elseif ( $theme_support[0] != 'twitter-bootstrap' ): ?>
+			<?php elseif ( isset($theme_support[0]) && $theme_support[0] != 'twitter-bootstrap' ): ?>
 				<script type="text/javascript">
 					jQuery(document).ready(function() {
 						jQuery(".profile-cct-shell-tabs").tabs();

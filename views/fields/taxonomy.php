@@ -128,7 +128,7 @@ class Profile_CCT_Taxonomy_Field extends Profile_CCT_Field {
 		$taxonomy_id = $field['type'];
 		$callback_args = array(
 			'taxonomy' => $field['type'],
-			'description' => $field['description'],
+			'description' => isset($field['description']) ? $field['description'] : '',
 		);
 		
 		$profile = Profile_CCT::get_object();

@@ -58,7 +58,7 @@ class Profile_CCT_DB_Field {
 	 * @param mixed $i
 	 * @return void
 	 */
-	function add_db_meta_box( $field, $context, $data, $i ) {
+	static function add_db_meta_box( $field, $context, $data, $i ) {
 		$profile = Profile_CCT::get_object();
 		
 		if ( isset( $profile::$settings['clone_fields'][$field['type']] ) ):

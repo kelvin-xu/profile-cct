@@ -64,7 +64,7 @@ Class Profile_CCT_Officehours extends Profile_CCT_Field {
 		) );
 		$this->input_multiple( array(
 			'field_id'        => 'days',
-			'selected_fields' => $this->data['days'],
+			'selected_fields' => isset($this->data['days']) ? $this->data['days'] : '',
 			'all_fields'      => $this->list_of_days(),
 		) );
 	}

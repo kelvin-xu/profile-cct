@@ -89,7 +89,7 @@
 		$widget_title = $_POST['widget_title'];
 		$profile::$settings['widget_title'] = $widget_title;
 		
-		$archive = $_POST['archive'];
+		$archive = isset($_POST['archive']) ? $_POST['archive'] : '';
 		$profile::$settings['archive'] = $archive;
 		
 		// Lets deal with permissions	
@@ -101,9 +101,9 @@
 				
 				foreach ( $permission_array as $permission => $can ):
 					if ( isset( $profile::$settings['permissions'][$user][$permission] ) ): // Does the permission exist in the settings
-						$profile::$settings['permissions'][$user][$permission] = (bool) $post_permissions[$user][$permission];
+						$profile::$settings['permissions'][$user][$permission] = isset($post_permissions[$user][$permission]) ? (bool) $post_permissions[$user][$permission] : false;
 						// Add the new capability
-						if ( (bool) $post_permissions[$user][$permission] ): 
+						if ( isset($post_permissions[$user][$permission]) && (bool) $post_permissions[$user][$permission] ): 
 							$role->add_cap( $permission );
 						else:
   							$role->remove_cap( $permission );

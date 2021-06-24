@@ -91,7 +91,7 @@ Class Profile_CCT_Professionalaffiliations extends Profile_CCT_Field {
 		) );
 		$this->display_text( array(
 			'field_id'     => 'active-date-year',
-			'field_type'   => $type,
+			'field_type'   => isset($type) ? $type : '',
 			'class'        => 'active-date-year',
 			'default_text' => '1951',
 			'separator'    => ' ',

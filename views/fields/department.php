@@ -32,14 +32,14 @@ Class Profile_CCT_Department extends Profile_CCT_Field {
 	 */
 	function field() {
 		$this->input_text( array(
-			'multiple' => $multiple,
+			'multiple' => isset($multiple) ? $multiple : '',
 			'field_id' => 'department',
 			'label'    => 'Name',
 			'size'     => 35,
 			'type'     => 'text',
 		) );
 		$this->input_text( array(
-			'multiple' => $multiple,
+			'multiple' => isset($multiple) ? $multiple : '',
 			'field_id' => 'url',
 			'label'    => 'Website - http://{value}',
 			'size'     => 35,

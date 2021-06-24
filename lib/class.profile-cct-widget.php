@@ -27,7 +27,7 @@ class Profile_CCT_Widget extends WP_Widget {
 		
 		// only apply this to post type = profile on the front end and on the main query
 		if ( $query->get('post_type') == 'profile_cct' && !is_admin() && $query->is_main_query() ):
-			if ( 'DESC' == $_GET['order'] ):
+			if ( isset($_GET['order']) && 'DESC' == $_GET['order'] ):
 				$pieces['orderby'] = str_replace( ' ASC', ' DESC', $pieces['orderby'] );
 			endif;
 			

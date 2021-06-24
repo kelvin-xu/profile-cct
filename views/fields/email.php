@@ -33,7 +33,7 @@ Class Profile_CCT_Email extends Profile_CCT_Field {
 		$current_user = wp_get_current_user();
 		
 		$default = '';
-		if ( Profile_CCT_Field::is_post( $options_or_post ) && $options_or_post->post_status == 'auto-draft' ):
+		if ( isset( $options_or_post ) && Profile_CCT_Field::is_post( $options_or_post ) && $options_or_post->post_status == 'auto-draft' ):
 			$default = $current_user->user_email;
 		endif;
 		
@@ -66,7 +66,7 @@ Class Profile_CCT_Email extends Profile_CCT_Field {
 	 * @return void
 	 */
 	function display_email( $attr ) {
-		$value = $this->data['email'];
+		$value = isset($this->data['email']) ? $this->data['email'] : '';
 		
 		if ( empty( $attr['mailto'] ) ):
 			$attr['mailto'] = ( 'edit' == $this->action ? $attr['default_text'] : $value );

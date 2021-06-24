@@ -170,7 +170,7 @@ class Profile_CCT_Field {
 		if ( 'edit' == $this->action ): ?>
 			<?php
 				$shell_type = 'shell-'.esc_attr( $this->type );
-				$is_active = ( ( isset( Profile_CCT_Admin::$current_form_fields ) && Profile_CCT_Admin::$current_form_fields[$this->type]['is_active'] == 1 ) ? "is-active" : "" );
+				$is_active = ( ( isset( Profile_CCT_Admin::$current_form_fields ) && isset(Profile_CCT_Admin::$current_form_fields[$this->type]) && Profile_CCT_Admin::$current_form_fields[$this->type]['is_active'] == 1 ) ? "is-active" : "" );
 			?>
 	 		<li class="field-item <?php echo $shell_type." ".$this->width." ".$this->class." ".$is_active; ?>" for="cct-<?php echo esc_attr( $this->type ); ?>" data-options="<?php echo esc_attr( $this->serialize( $this->options ) ); ?>" >
 				<div class="action-shell">
@@ -559,7 +559,7 @@ class Profile_CCT_Field {
 	 */
 	function input_label( $id, $label ) {
 		?>
-        <label for="<?php echo $id; ?>" ><?php echo $label; ?></label>
+        <label for="<?php echo $id; ?>" ><?php echo is_string($label) ? $label : ''; ?></label>
         <?php
 	}
 	
@@ -648,7 +648,7 @@ class Profile_CCT_Field {
 			if ( isset( $attr['value'] ) && $attr['value'] ):
 				$attr['display'] = $attr['value'];
 			else:
-				$attr['display'] = ( 'edit' == $this->action ? $attr['default_text'] : $this->data[$attr['field_id']] );
+				$attr['display'] = ( 'edit' == $this->action ? $attr['default_text'] : ( isset($this->data[$attr['field_id']]) ? $this->data[$attr['field_id']] : '' ) );
 			endif;
 		endif;
 		
@@ -659,7 +659,7 @@ class Profile_CCT_Field {
 		endif;
 		
 		if ( empty( $attr['href'] ) ):
-			$attr['href'] = ( 'edit' == $this->action ? $attr['default_text'] : $this->data[$attr['field_id']] );
+			$attr['href'] = ( 'edit' == $this->action ? $attr['default_text'] : ( isset($this->data[$attr['field_id']]) ? $this->data[$attr['field_id']] : '' ) );
 		endif;
 		
 		$this->display_text( $attr );
@@ -768,12 +768,12 @@ class Profile_CCT_Field {
 	 */
 	function display_attr( $attr, $field_type ) {
 		$lorem_ipsum  = '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In et tempor lorem. Nam eget sapien sit amet risus porttitor pellentesque. Sed vestibulum tellus et quam faucibus vel tristique metus sagittis. Integer neque justo, suscipit sit amet lobortis eu, aliquet imperdiet sapien. Morbi id tellus quis nisl tempor semper.</p><p>Nunc sed diam sit amet augue venenatis scelerisque quis eu ante. Cras mattis auctor turpis, non congue nibh auctor at. Nulla libero ante, dapibus a tristique eu, semper ac odio. Nulla ultrices dui et velit eleifend congue. Mauris vel mauris eu justo lobortis semper. Duis lacinia faucibus nibh, ac sodales leo condimentum id. Suspendisse commodo mattis dui, eu rutrum sapien vehicula a. Proin iaculis sollicitudin lacus vitae commodo.</p>';
-		$default_text = ( 'lorem ipsum' == $attr['default_text'] ? $lorem_ipsum : $attr['default_text'] );
+		$default_text = ( isset($attr['default_text']) && 'lorem ipsum' !== $attr['default_text'] ? $attr['default_text'] : $lorem_ipsum );
 		
 		$show = ( isset( $attr['field_id'] ) && ! in_array( $attr['field_id'], $this->show ) && in_array( $attr['field_id'], $this->show_fields )  ? ' style="display:none;"' : '' ); // should this field be displayed
 		
 		$needed_attr['id']               = ( isset( $attr['field_id'] ) && $attr['field_id'] ? $attr['field_id'] : '' );
-	    $needed_attr['display']          = ( 'edit' == $this->action          ? $default_text           : ( isset($attr['value']) ? $attr['value'] : $this->data[$needed_attr['id']] ) );
+	    $needed_attr['display']          = ( 'edit' == $this->action          ? $default_text           : ( isset($attr['value']) ? $attr['value'] : ( isset($this->data[$needed_attr['id']]) ? $this->data[$needed_attr['id']] : '' ) ) );
 		$needed_attr['field_shell_attr'] = ( isset( $attr['field_id'] )       ? ' class="'.$attr['field_id'].' '.$field_type.'-shell"' : ' class="'.$this->type.' '.$field_type.'-shell"' ).$show;
 	    $needed_attr['tag']              = ( isset( $attr['tag'] )            ? $attr['tag']            : 'span' );
 		$needed_attr['post_separator']   = ( isset( $attr['post_separator'] ) ? $attr['post_separator'] : ''     );

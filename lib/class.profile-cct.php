@@ -825,7 +825,7 @@ class Profile_CCT {
 							
 							add_meta_box( $id, $title, $callback, $post_type, $context, $priority, $callback_args );
 						else:
-							do_action( "profile_cct_".$field['type']."_add_meta_box", $field, $context, $data, $i );
+							do_action( "profile_cct_".$field['type']."_add_meta_box", $field, $context, $data, isset($i) ? $i : '' );
 						endif;
 					endforeach;
 				endif;
@@ -1016,7 +1016,7 @@ class Profile_CCT {
 		
 		$blogs = $this->convert_blog_list_into_blog_array( $field_index, $global_settings );
 		
-		if( $blogs[$blog_id] ): // we accually have the blog set up as true
+		if( isset($blogs[$blog_id]) && $blogs[$blog_id] ): // we accually have the blog set up as true
 			unset($blogs[$blog_id]);
 			unset( self::$settings['clone_fields'][$field['type']]);
 			
@@ -1068,9 +1068,9 @@ class Profile_CCT {
 		// convert global 
 		$blogs = array();
 		// convert global 
-		if ( is_array( $global_settings['clone_fields'][$field_index]['blogs'] ) ):
+		if ( isset($global_settings['clone_fields'][$field_index]['blogs']) && is_array( $global_settings['clone_fields'][$field_index]['blogs'] ) ):
 			$blogs = $global_settings['clone_fields'][$field_index]['blogs'];
-		elseif ( ! is_array( $global_settings['clone_fields'][$field_index]['blogs'] ) ):
+		elseif ( isset($global_settings['clone_fields'][$field_index]['blogs']) && ! is_array( $global_settings['clone_fields'][$field_index]['blogs'] ) ):
 			$blogs_ids = explode( ',', $global_settings['clone_fields'][$field_index]['blogs'] );
 			
 			foreach ( $blogs_ids as $id ):

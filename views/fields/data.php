@@ -14,7 +14,7 @@ Class Profile_CCT_Data extends Profile_CCT_Field {
 			'field_id' => 'url',
 			'label'    => 'Website - '.$this->options['url_prefix'],
 			'size'     => 35,
-			'value'    => $this->data['url'],
+			'value'    => isset($this->data['url']) ? $this->data['url'] : '',
 		) );
 	}
 	

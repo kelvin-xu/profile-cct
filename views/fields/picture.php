@@ -38,6 +38,7 @@ Class Profile_CCT_Picture extends Profile_CCT_Field {
 	
 	function picture() {
 		global $post;
+		$current_user = wp_get_current_user();
 		
 		$image = ( isset( $post ) ? Profile_CCT_Picture::get_the_post_thumbnail( $post->ID, 'profile-image' ) : get_avatar( $current_user->user_email, 150 ) );
 		?>
