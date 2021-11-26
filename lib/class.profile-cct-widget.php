@@ -153,6 +153,7 @@ class Profile_CCT_Widget extends WP_Widget {
 					
 					if ( ! empty( $visible['display_tax'] ) ):
 						foreach ( $visible['display_tax'] as $taxonomy_id => $value ):
+							error_log($taxonomy_id);
 							$taxonomy = get_taxonomy($taxonomy_id);
 							?>
 							<div class="profile-cct-search-<?php echo $taxonomy_id; ?> profile-cct-search-input">

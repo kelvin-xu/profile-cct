@@ -40,7 +40,7 @@ class Profile_CCT_Shortcodes {
 		endif;
 		
 		//Whether to OR or AND the criterias
-		if ( $atts['query'] ):	
+		if ( isset($atts['query']) ):	
 			$tax_query['relation'] = $atts['query'];
 		endif;
 		
@@ -49,24 +49,24 @@ class Profile_CCT_Shortcodes {
 			'order'          => 'ASC',
 			'orderby'        => 'menu_order',
 			'tax_query'      => $tax_query,
-			'post__not_in'   => explode( ",", $atts['exclude'] ),
+			'post__not_in'   => isset($atts['exclude']) ? explode( ",", $atts['exclude'] ) : array(),
 			'posts_per_page' => -1,
 		);
 		
-		if ( $atts['order'] ):
+		if ( isset( $atts['order'] ) ):
 			$query['order'] = $atts['order'];
 		endif;
 	
 		//If include is set
-		if ( $atts['include'] ):
+		if ( isset( $atts['include'] ) ):
 			$query['post__in'] = explode( ",", $atts['include'] );
 		endif;
 		
-		if ( $atts['limit'] && is_numeric( $atts['limit'] ) ):
+		if ( isset( $atts['limit'] ) && is_numeric( $atts['limit'] ) ):
 			$query['posts_per_page'] = $atts['limit'];
 		endif;
 		
-		if ( $atts['orderby'] ):
+		if ( isset( $atts['orderby'] ) ):
 			switch ( $atts['orderby'] ):
 				case 'first_name':
 					$query['orderby'] = 'title';
@@ -91,7 +91,7 @@ class Profile_CCT_Shortcodes {
 		
 		ob_start();	//we want to collect the output and return it instead of displaying it.
 		
-		if ( $atts['display'] == 'name' ):
+		if ( isset( $atts['display'] ) && $atts['display'] == 'name' ):
 			?>
 				<ul class="profilelist-shortcode">
 			<?php
@@ -104,11 +104,11 @@ class Profile_CCT_Shortcodes {
 		while ( $the_query->have_posts() ):
 			$the_query->the_post();
 			
-			if ( $atts['display'] == 'name' ):
+			if ( isset( $atts['display'] ) && $atts['display'] == 'name' ):
 				?>
 					<li><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></li>
 				<?php
-			elseif ( $atts['display'] == 'full' ):
+			elseif ( isset( $atts['display'] ) && $atts['display'] == 'full' ):
 				?>
 					<div id="post-<?php the_ID(); ?>" class="post-<?php the_ID(); ?> profile_cct type-profile_cct">
 						<?php the_content(); ?>
@@ -123,7 +123,7 @@ class Profile_CCT_Shortcodes {
 			endif;
 		endwhile;
 		
-		if ( $atts['display'] == 'name' ):
+		if ( isset( $atts['display'] ) && $atts['display'] == 'name' ):
 			?>
 				</ul>
 			<?php
@@ -199,9 +199,11 @@ class Profile_CCT_Shortcodes {
 		
 		if ( is_array( $atts ) ):
 			if ( isset( $atts['display_tax'] ) ):
+				$tax_array = array();
 				foreach ( explode( ",", $atts['display_tax'] ) as $taxonomy ):
-					$atts['display_tax'][$taxonomy] = 'true';
+					$tax_array += [$taxonomy => 'true'];
 				endforeach;
+				$atts['display_tax'] = $tax_array;
 			endif;
 		else:
 			$atts = $profile->settings['archive'];
