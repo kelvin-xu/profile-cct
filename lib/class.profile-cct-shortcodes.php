@@ -208,7 +208,6 @@ class Profile_CCT_Shortcodes {
 		else:
 			$atts = $profile->settings['archive'];
 		endif;
-		
 		return Profile_CCT_Widget::profile_search( $atts );
 	}
 	

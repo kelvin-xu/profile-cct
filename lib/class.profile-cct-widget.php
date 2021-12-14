@@ -153,7 +153,6 @@ class Profile_CCT_Widget extends WP_Widget {
 					
 					if ( ! empty( $visible['display_tax'] ) ):
 						foreach ( $visible['display_tax'] as $taxonomy_id => $value ):
-							error_log($taxonomy_id);
 							$taxonomy = get_taxonomy($taxonomy_id);
 							?>
 							<div class="profile-cct-search-<?php echo $taxonomy_id; ?> profile-cct-search-input">
@@ -161,7 +160,10 @@ class Profile_CCT_Widget extends WP_Widget {
 								<select name="<?php echo $taxonomy_id; ?>" id="profile-cct-<?php echo sanitize_html_class( $taxonomy->label ); ?>">
 									<option value="" selected="selected">All <?php echo $taxonomy->label; ?></option>
 									<?php
-									foreach ( get_terms( $taxonomy_id, array() ) as $term ):
+									foreach ( get_terms( array( 
+										'taxonomy' => $taxonomy->name,
+										'hide_empty' => false
+									) ) as $term ):
 										?>
 										<option value="<?php echo $term->slug; ?>"><?php echo $term->name; ?></option>
 										<?php
